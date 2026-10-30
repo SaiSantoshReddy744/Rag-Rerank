@@ -1,0 +1,382 @@
+{
+  "experiment": "m1-rerank-k20-v3",
+  "source_file": "m1-rerank-k20-v3.json",
+  "questions_in_file": 35,
+  "questions_evaluated": 30,
+  "top_k": 5,
+  "classification": {
+    "true_positive": 24,
+    "true_negative": 434,
+    "false_positive": 126,
+    "false_negative": 16,
+    "confusion_matrix": [
+      [
+        434,
+        126
+      ],
+      [
+        16,
+        24
+      ]
+    ],
+    "precision": 0.16,
+    "recall": 0.6,
+    "f1_score": 0.25263157894736843,
+    "accuracy": 0.7633333333333333,
+    "specificity": 0.775,
+    "evaluated_passages": 600
+  },
+  "roc_auc": 0.7600892857142857,
+  "macro_precision": 0.16,
+  "macro_recall": 0.5444444444444444,
+  "macro_f1_score": 0.2416666666666667,
+  "recall_at_5": 0.42976190476190473,
+  "mrr": 0.39111111111111113,
+  "ndcg_at_5": 0.3346263861839786,
+  "latency_ms": {
+    "mean": 20642.466666666667,
+    "median": 19977.5,
+    "p95": 29362.89999999998,
+    "generation_mean": 14694.5,
+    "measured_questions": 30
+  },
+  "per_question": [
+    {
+      "question_id": "Q001",
+      "question": "What is the 10X Rule?",
+      "precision": 0.4,
+      "recall": 1.0,
+      "f1_score": 0.5714285714285715,
+      "recall_at_5": 1.0,
+      "mrr": 0.5,
+      "ndcg_at_5": 0.6240505200038379,
+      "latency_ms": 33966
+    },
+    {
+      "question_id": "Q002",
+      "question": "What are the two parts of the 10X Rule?",
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "latency_ms": 15049
+    },
+    {
+      "question_id": "Q003",
+      "question": "What are the four degrees of action?",
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "latency_ms": 13278
+    },
+    {
+      "question_id": "Q004",
+      "question": "What does the fourth degree of action mean?",
+      "precision": 0.2,
+      "recall": 1.0,
+      "f1_score": 0.33333333333333337,
+      "recall_at_5": 1.0,
+      "mrr": 0.2,
+      "ndcg_at_5": 0.38685280723454163,
+      "latency_ms": 15424
+    },
+    {
+      "question_id": "Q005",
+      "question": "What are the four major mistakes people make when setting goals?",
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "latency_ms": 32881
+    },
+    {
+      "question_id": "Q006",
+      "question": "Why does the author believe people commonly underestimate the amount of action required to achieve a goal?",
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "latency_ms": 19288
+    },
+    {
+      "question_id": "Q007",
+      "question": "Why does the author consider average or normal levels of action dangerous?",
+      "precision": 0.4,
+      "recall": 1.0,
+      "f1_score": 0.5714285714285715,
+      "recall_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 1.0,
+      "latency_ms": 20649
+    },
+    {
+      "question_id": "Q008",
+      "question": "Why does the author argue that massive action can create new problems?",
+      "precision": 0.2,
+      "recall": 1.0,
+      "f1_score": 0.33333333333333337,
+      "recall_at_5": 1.0,
+      "mrr": 0.5,
+      "ndcg_at_5": 0.6309297535714575,
+      "latency_ms": 19867
+    },
+    {
+      "question_id": "Q009",
+      "question": "Why does the author believe success must be maintained rather than achieved only once?",
+      "precision": 0.2,
+      "recall": 1.0,
+      "f1_score": 0.33333333333333337,
+      "recall_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 1.0,
+      "latency_ms": 17888
+    },
+    {
+      "question_id": "Q010",
+      "question": "Why does the author argue that setting goals too low can limit the actions required to achieve them?",
+      "precision": 0.2,
+      "recall": 0.5,
+      "f1_score": 0.28571428571428575,
+      "recall_at_5": 0.5,
+      "mrr": 0.5,
+      "ndcg_at_5": 0.38685280723454163,
+      "latency_ms": 19359
+    },
+    {
+      "question_id": "Q011",
+      "question": "According to the author, what happens when someone dramatically underestimates the effort required for a goal?",
+      "precision": 0.4,
+      "recall": 1.0,
+      "f1_score": 0.5714285714285715,
+      "recall_at_5": 1.0,
+      "mrr": 0.25,
+      "ndcg_at_5": 0.5012658353418871,
+      "latency_ms": 20088
+    },
+    {
+      "question_id": "Q012",
+      "question": "If someone keeps operating at ordinary levels of effort, why might they remain stuck at ordinary results?",
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "latency_ms": 25063
+    },
+    {
+      "question_id": "Q013",
+      "question": "What does the book suggest about continuing to act after encountering resistance?",
+      "precision": 0.2,
+      "recall": 1.0,
+      "f1_score": 0.33333333333333337,
+      "recall_at_5": 0.5,
+      "mrr": 0.5,
+      "ndcg_at_5": 0.38685280723454163,
+      "latency_ms": 17530
+    },
+    {
+      "question_id": "Q014",
+      "question": "How does the author connect unusually ambitious thinking with unusually large amounts of action?",
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "latency_ms": 24449
+    },
+    {
+      "question_id": "Q015",
+      "question": "Why does the author believe fear should lead to action rather than avoidance?",
+      "precision": 0.2,
+      "recall": 1.0,
+      "f1_score": 0.33333333333333337,
+      "recall_at_5": 0.3333333333333333,
+      "mrr": 1.0,
+      "ndcg_at_5": 0.46927872602275644,
+      "latency_ms": 19244
+    },
+    {
+      "question_id": "Q016",
+      "question": "How does the author connect setting ambitious targets with estimating the effort required to achieve them?",
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "latency_ms": 20454
+    },
+    {
+      "question_id": "Q017",
+      "question": "How does the author connect massive thinking with massive action?",
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "latency_ms": 19646
+    },
+    {
+      "question_id": "Q018",
+      "question": "Why does the author connect normal levels of action with vulnerability to unexpected events?",
+      "precision": 0.2,
+      "recall": 1.0,
+      "f1_score": 0.33333333333333337,
+      "recall_at_5": 0.5,
+      "mrr": 0.5,
+      "ndcg_at_5": 0.38685280723454163,
+      "latency_ms": 18868
+    },
+    {
+      "question_id": "Q019",
+      "question": "How does the author connect taking massive action with encountering new problems and criticism?",
+      "precision": 0.2,
+      "recall": 1.0,
+      "f1_score": 0.33333333333333337,
+      "recall_at_5": 1.0,
+      "mrr": 0.5,
+      "ndcg_at_5": 0.6309297535714575,
+      "latency_ms": 21712
+    },
+    {
+      "question_id": "Q020",
+      "question": "How does the author connect achieving success with maintaining and creating additional success?",
+      "precision": 0.2,
+      "recall": 0.5,
+      "f1_score": 0.28571428571428575,
+      "recall_at_5": 0.5,
+      "mrr": 1.0,
+      "ndcg_at_5": 0.6131471927654584,
+      "latency_ms": 21837
+    },
+    {
+      "question_id": "Q021",
+      "question": "What are the four degrees of action, and which one does the author associate with exceptional success?",
+      "precision": 0.2,
+      "recall": 0.3333333333333333,
+      "f1_score": 0.25,
+      "recall_at_5": 0.25,
+      "mrr": 0.3333333333333333,
+      "ndcg_at_5": 0.19519002499605084,
+      "latency_ms": 16739
+    },
+    {
+      "question_id": "Q022",
+      "question": "What is the relationship between 10X goals and 10X actions according to the author?",
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "latency_ms": 22806
+    },
+    {
+      "question_id": "Q023",
+      "question": "What does the author mean by \"average\" and why does he consider it a failing formula?",
+      "precision": 0.2,
+      "recall": 0.5,
+      "f1_score": 0.28571428571428575,
+      "recall_at_5": 0.3333333333333333,
+      "mrr": 0.5,
+      "ndcg_at_5": 0.2960819109658652,
+      "latency_ms": 21525
+    },
+    {
+      "question_id": "Q024",
+      "question": "What does the author say about fear, and how should fear influence action?",
+      "precision": 0.2,
+      "recall": 0.5,
+      "f1_score": 0.28571428571428575,
+      "recall_at_5": 0.5,
+      "mrr": 1.0,
+      "ndcg_at_5": 0.6131471927654584,
+      "latency_ms": 24975
+    },
+    {
+      "question_id": "Q025",
+      "question": "What does the author identify as characteristics of successful people, and why does he believe these characteristics are attainable?",
+      "precision": 0.2,
+      "recall": 1.0,
+      "f1_score": 0.33333333333333337,
+      "recall_at_5": 0.14285714285714285,
+      "mrr": 0.5,
+      "ndcg_at_5": 0.21398626473452756,
+      "latency_ms": 21606
+    },
+    {
+      "question_id": "Q026",
+      "question": "How does the author distinguish between taking normal action and taking massive action?",
+      "precision": 0.2,
+      "recall": 0.5,
+      "f1_score": 0.28571428571428575,
+      "recall_at_5": 0.5,
+      "mrr": 0.5,
+      "ndcg_at_5": 0.38685280723454163,
+      "latency_ms": 17501
+    },
+    {
+      "question_id": "Q027",
+      "question": "Why does the author believe people who retreat may actually be reacting to their interpretation of failure rather than failure itself?",
+      "precision": 0.4,
+      "recall": 1.0,
+      "f1_score": 0.5714285714285715,
+      "recall_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 0.8772153153380493,
+      "latency_ms": 19621
+    },
+    {
+      "question_id": "Q028",
+      "question": "How does the author's experience of building his first business illustrate his argument about estimating effort?",
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "recall_at_5": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_5": 0.0,
+      "latency_ms": 21338
+    },
+    {
+      "question_id": "Q029",
+      "question": "What does the author mean when he says that successful people continue creating new levels of success instead of relying on previous achievements?",
+      "precision": 0.2,
+      "recall": 0.5,
+      "f1_score": 0.28571428571428575,
+      "recall_at_5": 0.5,
+      "mrr": 0.2,
+      "ndcg_at_5": 0.23719771276929622,
+      "latency_ms": 20180
+    },
+    {
+      "question_id": "Q030",
+      "question": "How does the book connect responsibility, action, and success?",
+      "precision": 0.2,
+      "recall": 1.0,
+      "f1_score": 0.33333333333333337,
+      "recall_at_5": 0.3333333333333333,
+      "mrr": 0.25,
+      "ndcg_at_5": 0.20210734650054757,
+      "latency_ms": 16443
+    }
+  ],
+  "interpretation_notes": [
+    "Precision, recall, F1 and confusion matrix use top-k selection as the positive prediction rule.",
+    "Unannotated candidate passages are assumed non-relevant; validate that gold evidence annotations are sufficiently complete.",
+    "ROC-AUC is None when both positive and negative labels are not present.",
+    "Latency is copied from the saved experiment and is not remeasured by this script.",
+    "Saved results are only valid for the dataset and model configuration used to produce them."
+  ]
+}

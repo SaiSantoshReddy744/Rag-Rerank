@@ -1,0 +1,21 @@
+[
+  {
+    "question": "What is the Sentinel roadmap primarily about?",
+    "expected_answer_contains": "trust",
+    "expected_doc_id": null,
+    "expected_chunk_keywords": ["trust", "roadmap"]
+  },
+  {
+    "question": "Which milestone focuses on tracing AI pipelines?",
+    "expected_answer_contains": "tracing",
+    "expected_doc_id": null,
+    "expected_chunk_keywords": ["tracing", "pipeline"]
+  },
+  {
+    "question": "What does the Skill Drill PDF cover in its early section?",
+    "expected_answer_contains": "React",
+    "expected_doc_id": null,
+    "expected_chunk_keywords": ["react", "challenges"]
+  }
+]
+

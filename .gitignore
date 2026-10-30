@@ -1,0 +1,20 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+build/
+dist/
+*.egg-info/
+.env
+/data/
+.coverage
+htmlcov/
+fixtures/
+
+eval/data/the-10x-rule-chunks.json
+# Benchmark generated results
+benchmarks/results/
+
+# Generated evaluation source/chunk catalogs
+eval/data/*-chunks.json

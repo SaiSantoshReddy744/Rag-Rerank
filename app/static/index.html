@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#111827"><meta name="description" content="Rag-Rerank — document question answering with neural reranking and inspectable evidence.">
+<title>Rag-Rerank – Document Question Answering with Neural Reranking</title>
+<style>
+:root{
+ --bg:#f5f7fc;--card:#fff;--ink:#172033;--muted:#718096;--line:#e7ebf3;
+ --brand:#635bff;--brand2:#8b5cf6;--ok:#079669;--warn:#b7791f;--err:#dc3545;
+ --side:#111827;--side-muted:#9ca3af;--r:18px;--shadow:0 10px 30px rgba(22,34,58,.055)
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);display:flex}
+button,input,textarea,select{font:inherit}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,.drop:focus-visible{outline:3px solid rgba(99,91,255,.3);outline-offset:2px}
+aside{width:270px;background:linear-gradient(180deg,#111827 0%,#171b35 100%);color:#e5e7eb;padding:26px 17px 20px;display:flex;flex-direction:column;gap:22px;flex-shrink:0;min-height:100vh;overflow-y:auto}
+.logo{font-size:27px;font-weight:850;letter-spacing:-1px;color:#fff}.logo span{color:#a5b4fc}
+.tag{font-size:12px;color:#aab3c5;margin-top:-17px;letter-spacing:.15px}
+nav{display:grid;gap:7px}
+nav button{display:flex;align-items:center;gap:11px;width:100%;text-align:left;background:transparent;border:1px solid transparent;color:#c7cfdf;padding:12px 13px;border-radius:12px;font-size:14px;font-weight:650;cursor:pointer;transition:background .24s ease,color .24s ease,border-color .24s ease,transform .24s ease}
+nav button:hover{background:rgba(255,255,255,.07);color:#fff}
+nav button.active{background:linear-gradient(120deg,rgba(99,91,255,.28),rgba(139,92,246,.18));border-color:rgba(165,180,252,.28);color:#fff;box-shadow:inset 3px 0 #a5b4fc}
+.side-h{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:#8792a7;font-weight:800}
+#docs{margin-top:11px!important}
+.doc{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:11px;font-size:13px;display:flex;justify-content:space-between;gap:8px;align-items:center;cursor:pointer;transition:background .24s ease,border-color .24s ease,transform .24s ease;min-width:0}
+.doc:hover,.doc.sel{background:rgba(99,91,255,.17);border-color:rgba(165,180,252,.42)}
+.doc>div{min-width:0;overflow-wrap:anywhere}.doc small{display:block;color:#9ba7bc;font-size:11px;line-height:1.5;margin-top:4px}.doc .x{background:none;border:0;color:#fda4af;cursor:pointer;font-size:15px;padding:3px}
+.status{font-size:12px;display:flex;flex-direction:column;gap:9px;margin-top:auto;border-top:1px solid rgba(255,255,255,.1);padding:16px 4px 0;color:#c7cfdf}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:8px;background:#888}.dot.ok{background:#34d399;box-shadow:0 0 0 3px rgba(52,211,153,.12)}.dot.bad{background:#fb7185}
+main{flex:1;overflow-y:auto;padding:35px clamp(20px,4vw,58px);min-width:0;max-width:1700px;margin:0 auto;width:100%}
+.view{display:none;animation:fadeUp .25s ease}.view.active{display:block}
+@keyframes fadeUp{from{opacity:.3;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.eyebrow{display:inline-flex;align-items:center;gap:7px;color:var(--brand);font-size:12px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;margin-bottom:11px}
+h1{margin:0 0 8px;font-size:clamp(25px,3vw,36px);line-height:1.15;letter-spacing:-1.15px;font-weight:800;max-width:950px}
+.sub{color:var(--muted);margin:0 0 26px;font-size:15px;line-height:1.75;max-width:850px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:24px;box-shadow:var(--shadow);margin-bottom:18px;transition:box-shadow .26s ease,border-color .26s ease,transform .26s ease}
+.card:hover{box-shadow:0 14px 34px rgba(22,34,58,.075);border-color:#dce2f0}
+.card h3{margin:0 0 15px;font-size:17px;letter-spacing:-.2px;display:flex;align-items:center;gap:9px}
+.step{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:9px;background:#eeedff;color:var(--brand);font-size:12px;font-weight:850}
+.drop{border:1.5px dashed #c9cbea;border-radius:15px;padding:31px 18px;text-align:center;color:var(--muted);cursor:pointer;transition:.2s;background:linear-gradient(135deg,#fbfbff,#f8f7ff)}
+.drop:before{content:"↑";display:grid;place-items:center;margin:0 auto 12px;width:42px;height:42px;border-radius:13px;background:#eeedff;color:var(--brand);font-size:23px;font-weight:800}
+.drop:hover,.drop.over{border-color:var(--brand);background:#f4f3ff;color:var(--brand);transform:translateY(-1px)}
+.drop strong{display:block;color:var(--ink);font-size:15px;margin-bottom:6px}.drop span{font-size:13px}
+textarea{width:100%;min-height:112px;resize:vertical;padding:16px;border-radius:13px;border:1px solid #e0e5ef;background:#fbfcff;color:var(--ink);font-size:15px;line-height:1.7;transition:border-color .24s ease,box-shadow .24s ease,background .24s ease}
+textarea:focus{outline:3px solid rgba(99,91,255,.12);border-color:var(--brand);background:#fff}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:15px}
+button.primary{background:linear-gradient(120deg,var(--brand),var(--brand2));color:#fff;border:0;border-radius:11px;padding:12px 20px;font-size:14px;font-weight:750;cursor:pointer;transition:transform .24s ease,box-shadow .24s ease,filter .24s ease;box-shadow:0 5px 13px rgba(99,91,255,.2)}
+button.primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(99,91,255,.28)}button.primary:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
+select{padding:10px 12px;border-radius:9px;border:1px solid var(--line);background:#fff;color:var(--ink);font-size:13px;margin-left:5px;transition:border-color .2s ease,box-shadow .2s ease}
+label{font-size:13px!important;color:var(--muted)}
+.answer{white-space:pre-wrap;line-height:1.85;font-size:16px;color:#293449}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 0}.chip{background:#f7f8fc;border:1px solid #e9ecf5;border-radius:9px;padding:8px 11px;font-size:12px;color:#667085}.chip b{color:#273247;margin-left:3px}
+.src{border:1px solid #e8eaf5;border-left:3px solid var(--brand);background:#fafbff;border-radius:11px;padding:13px 15px;margin-top:10px;font-size:12px;line-height:1.7}
+.src .meta{font-size:11px;color:var(--muted);margin-bottom:7px}.src .meta b{color:var(--brand)}.src .txt{max-height:170px;overflow:auto;white-space:pre-wrap;color:#3b4659}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}.cols .card{min-width:0}
+.p{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:9px;font-size:12px;background:#fff}
+.p.used{border-color:#16a36a;background:#f5fcf8;box-shadow:inset 3px 0 #16a36a}
+.p .h{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:var(--muted);margin-bottom:8px;flex-wrap:wrap}.p .t{max-height:105px;overflow:auto;white-space:pre-wrap;line-height:1.65;color:#3b4659}
+.mv{font-weight:800}.mv.up{color:var(--ok)}.mv.down{color:var(--err)}.mv.same{color:var(--muted)}
+.toast{position:fixed;right:22px;bottom:22px;display:flex;flex-direction:column;gap:9px;z-index:9}
+.toast div{padding:13px 17px;border-radius:12px;color:#fff;box-shadow:0 12px 30px #10182824;max-width:420px;font-size:13px;animation:fadeUp .2s}.toast .ok{background:#07875d}.toast .err{background:#c92a3a}.toast .info{background:#5549e8}
+.spin{width:16px;height:16px;border:2px solid #e5e7eb;border-top-color:var(--brand);border-radius:50%;animation:s .8s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px}
+@keyframes s{to{transform:rotate(360deg)}}
+.empty{color:var(--muted);text-align:center;padding:30px 16px;font-size:14px;line-height:1.7}
+.errbox{background:#fff5f5;border:1px solid #fecaca;color:#b42332;padding:13px 15px;border-radius:11px;font-size:14px;line-height:1.65}
+table{width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap}th,td{padding:12px 13px;border-bottom:1px solid var(--line);text-align:right}th{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#667085;background:#f8f9fc}th:first-child,td:first-child{text-align:left}
+.notice{background:#fff9eb;border:1px solid #f5d48a;color:#8a5b0b;padding:13px 16px;border-radius:11px;font-size:13px;line-height:1.65;margin-bottom:14px}
+.eval-controls{display:flex;align-items:end;gap:16px;flex-wrap:wrap;margin-top:8px}.eval-controls label{display:flex;flex-direction:column;gap:7px}.eval-controls input[type=file]{max-width:300px;font-size:13px;color:var(--muted)}.eval-controls select{min-width:260px;margin:0}.template-link{font-size:14px;color:var(--brand);font-weight:700;text-decoration:none;padding:10px 4px}.template-link:hover{text-decoration:underline}.eval-help{font-size:13px;line-height:1.7;color:var(--muted);margin:18px 0 0}.eval-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}.eval-stat{background:#fff;border:1px solid var(--line);border-radius:13px;padding:15px}.eval-stat span{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}.eval-stat b{font-size:16px;overflow-wrap:anywhere}.eval-chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px}.eval-chart{background:#fff;border:1px solid var(--line);border-radius:14px;padding:17px}.eval-chart h3{font-size:15px;margin:0 0 14px}.bar-line{display:grid;grid-template-columns:90px 1fr 52px;align-items:center;gap:8px;margin:10px 0;font-size:12px;color:var(--muted)}.bar-track{height:12px;background:#eef0f7;border-radius:99px;overflow:hidden}.bar-fill{height:100%;border-radius:inherit;transition:width .7s cubic-bezier(.2,.75,.25,1)}.bar-fill.dense{background:linear-gradient(90deg,#5f5bff,#8b5cf6)}.bar-fill.reranked{background:linear-gradient(90deg,#079669,#34d399)}.bar-line b{text-align:right;color:var(--ink);font-variant-numeric:tabular-nums}.eval-results-table{overflow:auto}.eval-results-table table{white-space:normal;min-width:760px}.eval-results-table td:first-child{min-width:260px;max-width:440px;white-space:normal;text-align:left}.legend{display:flex;gap:16px;color:var(--muted);font-size:12px;margin:0 0 12px}.legend span:before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;background:#6c63ff}.legend span+span:before{background:#12a878}
+button:active{transform:translateY(1px)}
+.doc{word-break:break-word}.doc .x{flex:none;border-radius:7px}.doc .x:hover{background:rgba(251,113,133,.12)}
+.progress{height:4px;background:#eeedff;border-radius:99px;overflow:hidden;flex:1;min-width:110px}.progress:after{content:"";display:block;width:38%;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand2));border-radius:inherit;animation:progress 1.2s ease-in-out infinite alternate}
+@keyframes progress{from{transform:translateX(-15%)}to{transform:translateX(190%)}}
+.drop:focus-visible{border-color:var(--brand)}
+@media(max-width:1050px){.cols{grid-template-columns:1fr}main{padding:26px 24px}}
+@media(max-width:760px){body{flex-direction:column}aside{width:100%;min-height:auto;gap:13px;padding:16px;position:relative}nav{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}nav button{justify-content:center;text-align:center;padding:10px 6px;font-size:12px;gap:5px}.status{margin-top:0;display:grid;grid-template-columns:repeat(3,1fr);padding-top:12px}.side-h,#docs{display:none!important}.tag{margin-top:-10px}main{padding:22px 14px}.card{padding:17px}h1{font-size:27px}.row{align-items:flex-start}.row label{display:flex;align-items:center;gap:3px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+/* Generated answers shown beneath each evaluation question. */
+.eval-results-table td.answer-cell{min-width:0;max-width:none;text-align:left;background:#fafbff}.answer-cell details{padding:3px 0}.answer-cell summary{cursor:pointer;color:var(--brand);font-weight:750}.answer-cell .answer{margin-top:12px;font-size:16px;line-height:1.7}.answer-cell small{display:block;margin-top:8px;color:var(--muted)}
+/* High-clarity visual refresh */
+html,body{font-size:16px}
+body{background:radial-gradient(ellipse at 82% 0%,rgba(199,210,254,.34),transparent 36%),linear-gradient(135deg,#f7f8ff 0%,#f1f4fb 100%)}
+aside{width:288px;padding:30px 18px 22px;gap:24px;background:linear-gradient(165deg,#10172a 0%,#171d3a 58%,#201e48 100%);box-shadow:10px 0 40px rgba(18,26,53,.08)}
+.logo{font-size:31px;letter-spacing:-1.4px}.tag{font-size:13px;letter-spacing:.35px}
+nav{gap:9px}nav button{font-size:15px;padding:14px 14px;border-radius:13px}nav button:hover{transform:translateX(2px)}
+.side-h{font-size:12px}.doc{padding:12px;font-size:14px;border-radius:14px}.doc small{font-size:12px}.status{font-size:13px;gap:11px;padding-top:18px}
+main{padding:42px clamp(24px,4.5vw,68px);max-width:1800px}
+.eyebrow{font-size:13px;margin-bottom:13px}h1{font-size:clamp(34px,3.4vw,44px);line-height:1.12;letter-spacing:-1.5px}.sub{font-size:17px;line-height:1.75;max-width:920px;margin-bottom:30px}
+.card{padding:29px;border-radius:22px;box-shadow:0 12px 34px rgba(24,35,66,.065);margin-bottom:20px}.card:hover{transform:translateY(-2px);box-shadow:0 18px 42px rgba(24,35,66,.10)}.card h3{font-size:19px;margin-bottom:18px}
+.step{width:32px;height:32px;border-radius:10px;font-size:14px}
+.drop{min-height:174px;padding:38px 20px;border-radius:18px;background:linear-gradient(135deg,#fbfbff 0%,#f2f0ff 100%)}.drop strong{font-size:17px}.drop span{font-size:14px}.drop:before{width:48px;height:48px;font-size:26px}
+textarea{min-height:132px;padding:18px;border-radius:15px;font-size:16px;line-height:1.75}
+button.primary{font-size:15px;padding:14px 22px;border-radius:13px;box-shadow:0 8px 18px rgba(99,91,255,.24)}button.primary:hover{filter:saturate(1.12);transform:translateY(-2px);box-shadow:0 12px 24px rgba(99,91,255,.30)}
+select{font-size:14px;padding:11px 13px;border-radius:11px}label{font-size:14px!important}.answer{font-size:18px;line-height:1.85}
+.chips{gap:9px;margin-top:19px}.chip{font-size:13px;padding:9px 12px;border-radius:11px}
+.p{font-size:14px;padding:15px;border-radius:14px}.p .h{font-size:13px}.p .t{font-size:14px;line-height:1.75;max-height:140px}
+.empty{font-size:15px}.errbox{font-size:15px;padding:16px 18px;border-radius:14px}.notice{font-size:14px;padding:16px 18px;border-radius:14px}
+table{font-size:14px}th{font-size:13px}th,td{padding:14px 15px}
+.eval-controls{gap:20px}.eval-controls input[type=file]{font-size:14px}.template-link,.eval-help{font-size:15px}.eval-stat{padding:18px;border-radius:15px}.eval-stat span{font-size:14px}.eval-stat b{font-size:18px}.eval-chart{padding:20px;border-radius:16px}.eval-chart h3{font-size:17px}.bar-line{grid-template-columns:118px 1fr 62px;gap:10px;font-size:14px}.bar-track{height:14px}.legend{font-size:14px}.eval-results-table td:first-child{min-width:300px}
+.toast div{font-size:14px;padding:15px 19px;border-radius:14px}
+@media(max-width:1050px){main{padding:30px 26px}.card{padding:23px}}
+@media(max-width:760px){aside{width:100%;gap:14px;padding:17px}.logo{font-size:27px}.tag{font-size:12px}nav button{font-size:13px;padding:11px 5px}main{padding:24px 15px}.card{padding:19px;border-radius:18px}h1{font-size:31px}.sub{font-size:16px}.card h3{font-size:17px}.answer{font-size:17px}.eval-controls select{min-width:0;width:100%}.eval-controls label{width:100%}.eval-controls input[type=file]{max-width:100%}.bar-line{grid-template-columns:100px 1fr 58px;font-size:12px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<aside>
+  <div><div class="logo">Rag<span>-Rerank</span></div></div>
+  <div class="tag">DOCUMENT INTELLIGENCE · RAG LAB</div>
+  <nav>
+    <button class="active" data-view="qa">✳ &nbsp; Document QA</button>
+    <button data-view="retrieval">⌕ &nbsp; Retrieval Results</button>
+    <button data-view="eval">▥ &nbsp; Evaluation</button>
+  </nav>
+  <div><div class="side-h">Documents</div><div id="docs" style="margin-top:8px;display:flex;flex-direction:column;gap:8px"></div></div>
+  <div class="status" id="status"></div>
+</aside>
+<main>
+<section class="view active" id="view-qa">
+  <div class="eyebrow">✦ &nbsp; AI research workspace</div><h1>Ask your documents.<br>Get answers with evidence.</h1>
+  <p class="sub">Explore your PDFs with retrieval-augmented generation. A neural reranker reorders the most relevant passages before the answer is generated — with source evidence you can inspect.</p>
+  <div class="card">
+    <h3><span class="step">01</span> Add a document</h3>
+    <div class="drop" id="drop" role="button" tabindex="0" aria-label="Choose or drop a PDF document"><strong>Drop your PDF here</strong><span>or click to browse files · PDF documents only · up to 50 MB</span><input type="file" id="file" accept="application/pdf,.pdf" hidden></div>
+    <div id="upstate" class="row"></div>
+  </div>
+  <div class="card">
+    <h3><span class="step">02</span> Ask a question</h3>
+    <textarea id="q" placeholder="Ask something specific about your document…&#10;e.g. What are the main findings and what evidence supports them?"></textarea>
+    <div class="row">
+      <button class="primary" id="ask">✦ &nbsp; Generate answer</button>
+      <label style="font-size:13px;color:var(--muted)">Search in
+        <select id="docsel"><option value="">All documents</option></select></label>
+      <label style="font-size:13px;color:var(--muted)">Passages to use
+        <select id="topk"><option>3</option><option selected>5</option><option>8</option><option>12</option><option>20</option></select></label>
+      <span id="busy"></span>
+    </div>
+  </div>
+  <div id="result"></div>
+</section>
+
+<section class="view" id="view-retrieval">
+  <div class="eyebrow">✦ &nbsp; Explainability</div><h1>Retrieval, made visible.</h1>
+  <p class="sub">Compare the passages found by vector search with the order after neural reranking. Green-highlighted passages are the evidence sent to the answer model.</p>
+  <div id="retr"><div class="empty">Ask a question first to see retrieval and reranking results.</div></div>
+</section>
+
+<section class="view" id="view-eval">
+  <div class="eyebrow">✦ &nbsp; Research metrics</div><h1>Evaluate a PDF.</h1>
+  <p class="sub">Run the same labeled questions with dense retrieval and neural reranking, then compare their retrieval quality and speed for this document.</p>
+  <div class="card">
+    <h3><span class="step">01</span> Choose a PDF and evaluation set</h3>
+    <div class="eval-controls">
+      <label>PDF to evaluate<br><select id="evaldoc"><option value="">Select an indexed PDF</option></select></label>
+      <label>Questions CSV<br><input id="evalfile" type="file" accept=".csv,text/csv"></label>
+      <a class="template-link" href="/static/evaluation-template.csv" download>Download CSV template</a>
+      <button class="primary" id="runEval">Run evaluation</button>
+    </div>
+    <p class="eval-help">CSV columns: <code>question,relevant_pages</code>. Put supporting page numbers in the second column, separated by semicolons (example: <code>2;5</code>). Use 1–30 questions and check the page labels against the PDF. The run generates one answer from reranked passages per question, using one configured model API call per question.</p>
+  </div>
+  <div id="evalbox"><div class="empty">Choose an indexed PDF and a labeled questions CSV to begin.</div></div>
+</section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let docs=[], selected="", last=null;
+
+function toast(msg,kind="info",ms=5000){const d=document.createElement("div");d.className=kind;d.textContent=msg;$("#toast").appendChild(d);setTimeout(()=>d.remove(),ms)}
+async function api(path,opts){
+  let r; try{r=await fetch(path,opts)}catch(e){throw new Error("Cannot reach the server. Is it running?")}
+  let body=null; try{body=await r.json()}catch(e){}
+  if(!r.ok){const m=body&&body.error?body.error.message:`HTTP ${r.status}`;const err=new Error(m);err.status=r.status;throw err}
+  return body;
+}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x===b));
+  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id==="view-"+b.dataset.view));
+  if(b.dataset.view==="eval")loadEval();
+});
+
+async function loadHealth(){
+  try{const h=await api("/v1/health");
+    $("#status").innerHTML=
+     `<div><span class="dot ${h.qdrant_connected?"ok":"bad"}"></span>Vector DB</div>`+
+     `<div><span class="dot ${h.openai_configured?"ok":"bad"}"></span>OpenAI ${h.openai_configured?esc(h.openai_model):"(set key/model in .env)"}</div>`+
+     `<div><span class="dot ${h.reranker_enabled?"ok":"bad"}"></span>Reranker ${h.reranker_enabled?esc(h.reranker_model):"disabled"}</div>`;
+  }catch(e){$("#status").innerHTML=`<div><span class="dot bad"></span>Server unreachable</div>`}
+}
+async function loadDocs(){
+  try{docs=await api("/v1/documents")}catch(e){docs=[]}
+  if(selected&&!docs.find(d=>d.doc_id===selected))selected="";
+  $("#docs").innerHTML=docs.length?docs.map(d=>`<div class="doc ${d.doc_id===selected?"sel":""}" data-id="${esc(d.doc_id)}"><div>${esc(d.filename)}<small>✓ indexed · ${d.page_count} pages · ${d.chunk_count} chunks</small></div><button class="x" title="Delete" data-del="${esc(d.doc_id)}">✕</button></div>`).join(""):`<div style="font-size:12px;color:#8a90c4">No documents yet</div>`;
+  $("#docsel").innerHTML=`<option value="">All documents</option>`+docs.map(d=>`<option value="${esc(d.doc_id)}" ${d.doc_id===selected?"selected":""}>${esc(d.filename)}</option>`).join("");
+  const evalSelect=$("#evaldoc");
+  if(evalSelect){const previous=evalSelect.value;evalSelect.innerHTML=`<option value="">Select an indexed PDF</option>`+docs.map(d=>`<option value="${esc(d.doc_id)}">${esc(d.filename)}</option>`).join("");if(docs.some(d=>d.doc_id===previous))evalSelect.value=previous;else if(docs.length===1)evalSelect.value=docs[0].doc_id}
+  document.querySelectorAll(".doc").forEach(el=>el.onclick=e=>{
+    if(e.target.dataset.del){return delDoc(e.target.dataset.del)}
+    selected=selected===el.dataset.id?"":el.dataset.id;loadDocs()});
+}
+async function delDoc(id){
+  if(!confirm("Remove this document from the index?"))return;
+  try{await api("/v1/documents/"+id,{method:"DELETE"});toast("Document removed","ok");loadDocs()}catch(e){toast(e.message,"err")}
+}
+$("#docsel").onchange=e=>{selected=e.target.value;loadDocs()};
+
+// Upload
+const drop=$("#drop"),file=$("#file");
+drop.onclick=()=>file.click();
+drop.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();file.click()}};
+["dragover","dragenter"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("over")}));
+["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("over")}));
+drop.addEventListener("drop",e=>{if(e.dataTransfer.files[0])upload(e.dataTransfer.files[0])});
+file.onchange=()=>{if(file.files[0])upload(file.files[0]);file.value=""};
+async function upload(f){
+  if(!f.name.toLowerCase().endsWith(".pdf")){toast("Only PDF files are supported","err");return}
+  if(f.size>50*1024*1024){toast("PDF exceeds the 50 MB upload limit","err");return}
+  drop.setAttribute("aria-busy","true");
+  $("#upstate").innerHTML=`<span class="progress" aria-hidden="true"></span><span>Preparing <b>${esc(f.name)}</b> · extracting, embedding and indexing. First use may download the embedding model.</span>`;
+  const fd=new FormData();fd.append("file",f);
+  try{const r=await api("/v1/upload",{method:"POST",body:fd});
+    $("#upstate").innerHTML=`<span style="color:var(--ok)">✓ ${esc(r.filename)} indexed — ${r.chunk_count} chunks</span>`;
+    toast("PDF indexed successfully","ok");selected=r.doc_id;await loadDocs();
+  }catch(e){$("#upstate").innerHTML=`<div class="errbox">${esc(e.message)}</div>`;toast(e.message,"err",8000)}
+  finally{drop.removeAttribute("aria-busy")}
+}
+
+// Ask
+$("#ask").onclick=ask;
+$("#q").addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey))ask()});
+async function ask(){
+  const q=$("#q").value.trim();
+  if(!q){toast("Type a question first","err");return}
+  if(!docs.length){toast("Upload a PDF first","err");return}
+  $("#ask").disabled=true;
+  $("#busy").innerHTML=`<span class="spin"></span> Retrieving → reranking → generating…`;
+  $("#result").innerHTML="";
+  const t0=performance.now();
+  try{
+    const r=await api("/v1/chat",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({message:q,doc_id:selected||null,top_k:parseInt($("#topk").value)})});
+    r._wall=Math.round(performance.now()-t0);last=r;renderAnswer(r);renderRetrieval(r);toast("Answer generated","ok",2500);
+  }catch(e){$("#result").innerHTML=`<div class="errbox"><b>Request failed.</b> ${esc(e.message)}</div>`;toast(e.message,"err",9000)}
+  finally{$("#ask").disabled=false;$("#busy").innerHTML=""}
+}
+const sec=ms=>(ms/1000).toFixed(2)+" s";
+function renderAnswer(r){
+  const l=r.latency_ms;
+  $("#result").innerHTML=`
+   <div class="card"><h3>Answer</h3><div class="answer">${esc(r.answer)}</div>
+    <div class="chips">
+      <span class="chip">Retrieved passages <b>${r.retrieved_count}</b></span>
+      <span class="chip">After reranking <b>${r.reranker_enabled?r.reranked_count:"not applied"}</b></span>
+      <span class="chip">Sent to OpenAI <b>${r.sources.length}</b></span>
+      <span class="chip">Embed <b>${l.embedding} ms</b></span><span class="chip">Search <b>${l.retrieval} ms</b></span>
+      <span class="chip">Rerank <b>${r.reranker_enabled?l.rerank+" ms":"—"}</b></span><span class="chip">OpenAI <b>${l.llm} ms</b></span>
+      <span class="chip">Total <b>${sec(l.total)}</b></span><span class="chip">Model <b>${esc(r.generation_model)}</b></span>
+    </div></div>
+  `;
+}
+function passageHTML(p,mode){
+  let mv="";
+  if(mode==="after"){const d=p.vector_rank-p.rank;
+    mv=d>0?`<span class="mv up">▲ ${d} (was #${p.vector_rank})</span>`:d<0?`<span class="mv down">▼ ${-d} (was #${p.vector_rank})</span>`:`<span class="mv same">= (was #${p.vector_rank})</span>`}
+  const sc=mode==="before"?`vector score ${p.vector_score.toFixed(3)}`:`rerank score ${p.rerank_score==null?"n/a":p.rerank_score.toFixed(3)}`;
+  return `<div class="p ${p.used_in_prompt?"used":""}"><div class="h"><span><b>#${p.rank}</b> ${esc(p.filename)} · p.${p.page_number}</span><span>${sc} ${mv}</span></div><div class="t">${esc(p.text)}</div></div>`;
+}
+function renderRetrieval(r){
+  const after=r.reranker_enabled?r.after_rerank:[];
+  $("#retr").innerHTML=`
+   <div class="card"><b>Question:</b> ${esc($("#q").value)}<div class="chips">
+     <span class="chip">Candidates <b>${r.retrieved_count}</b></span>
+     <span class="chip">Reranker <b>${r.reranker_enabled?esc(r.reranker_model):"disabled"}</b></span>
+     <span class="chip">Green border = sent to OpenAI</span></div></div>
+   <div class="cols">
+    <div class="card"><h3>Before reranking (vector similarity)</h3>${r.before_rerank.map(p=>passageHTML(p,"before")).join("")}</div>
+    <div class="card"><h3>After reranking (cross-encoder)</h3>${r.reranker_enabled?after.map(p=>passageHTML(p,"after")).join(""):'<div class="empty">Reranking was not applied (RE_RANK_ENABLED=false).</div>'}</div>
+   </div>`;
+}
+
+// Per-PDF evaluation, based on human-checked relevant page labels in a CSV.
+const evalMetrics=[["precision_at_k","Precision@5"],["recall_at_k","Recall@5"],["f1_at_k","F1@5"],["mrr","MRR"],["ndcg_at_k","nDCG@5"],["roc_auc","AUC-ROC"]];
+function parseCsv(text){
+  const rows=[];let row=[],cell="",quoted=false;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i];
+    if(ch==='"'){
+      if(quoted&&text[i+1]==='"'){cell+='"';i++}else quoted=!quoted;
+    }else if(ch===","&&!quoted){row.push(cell.trim());cell=""}
+    else if((ch==='\n'||ch==='\r')&&!quoted){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(cell.trim());if(row.some(value=>value!==""))rows.push(row);row=[];cell=""}
+    else cell+=ch;
+  }
+  if(cell||row.length){row.push(cell.trim());if(row.some(value=>value!==""))rows.push(row)}
+  return rows;
+}
+async function readEvalCsv(file){
+  const text=(await file.text()).replace(/^\uFEFF/,"");const rows=parseCsv(text);
+  if(rows.length<2)throw new Error("The CSV needs a header and at least one question row.");
+  const headers=rows[0].map(x=>x.toLowerCase()),qi=headers.indexOf("question"),pi=headers.indexOf("relevant_pages");
+  if(qi<0||pi<0)throw new Error("CSV headers must include question and relevant_pages.");
+  const questions=rows.slice(1).filter(r=>r.some(c=>c)).map((r,i)=>{const question=r[qi]||"",pages=(r[pi]||"").split(/[;| ]+/).filter(Boolean).map(Number);if(question.length<3||!pages.length||pages.some(n=>!Number.isInteger(n)||n<1))throw new Error(`Row ${i+2}: enter a question and valid page number(s), e.g. 2;5.`);return {question,relevant_pages:[...new Set(pages)]}});
+  if(!questions.length||questions.length>30)throw new Error("Provide between 1 and 30 valid questions.");return questions;
+}
+const fmtMetric=v=>v==null?"—":`${(Number(v)*100).toFixed(1)}%`;
+function metricChart(label,key,summary){const dense=summary.dense[key]==null?null:Number(summary.dense[key]),reranked=summary.reranked[key]==null?null:Number(summary.reranked[key]);return `<div class="eval-chart"><h3>${label}</h3>${[["Dense retrieval",dense,"dense"],["With reranking",reranked,"reranked"]].map(([name,value,cls])=>`<div class="bar-line"><span>${name}</span><div class="bar-track"><div class="bar-fill ${cls}" style="width:${value==null?0:Math.max(0,Math.min(100,value*100))}%"></div></div><b>${fmtMetric(value)}</b></div>`).join("")}</div>`}
+function latencyChart(summary){const dense=Number(summary.dense.mean_latency_ms||0),reranked=Number(summary.reranked.mean_latency_ms||0),max=Math.max(dense,reranked,1);return `<div class="eval-chart"><h3>Mean retrieval latency</h3>${[["Dense retrieval",dense,"dense"],["With reranking",reranked,"reranked"]].map(([name,value,cls])=>`<div class="bar-line"><span>${name}</span><div class="bar-track"><div class="bar-fill ${cls}" style="width:${Math.max(1,value/max*100)}%"></div></div><b>${(value/1000).toFixed(2)} s</b></div>`).join("")}</div>`}
+function renderEval(data){const s=data.summary,rows=data.questions.map(q=>`<tr><td>${esc(q.question)}<br><small>Relevant page(s): ${q.relevant_pages.join(", ")}</small></td><td>${fmtMetric(q.dense.mrr)}</td><td>${fmtMetric(q.reranked.mrr)}</td><td>${(q.dense_latency_ms/1000).toFixed(2)} s</td><td>${(q.reranked_latency_ms/1000).toFixed(2)} s</td></tr><tr><td class="answer-cell" colspan="5"><details><summary>Show generated answer (reranked)</summary><div class="answer">${esc(q.generated_answer)}</div><small>Answer generation: ${(q.answer_generation_ms/1000).toFixed(2)} s · answer quality is not automatically scored.</small></details></td></tr>`).join("");
+  $("#evalbox").innerHTML=`<div class="eval-summary"><div class="eval-stat"><span>PDF evaluated</span><b>${esc(data.filename)}</b></div><div class="eval-stat"><span>Test questions</span><b>${data.question_count}</b></div><div class="eval-stat"><span>Candidate passages</span><b>${data.candidate_k}</b></div><div class="eval-stat"><span>Final passages</span><b>Top ${data.top_k}</b></div><div class="eval-stat"><span>Mean answer generation</span><b>${(s.mean_answer_generation_ms/1000).toFixed(2)} s</b></div></div><div class="notice">Metrics use your verified relevant page labels (page-level relevance). Retrieval latency excludes answer generation. One answer was generated from reranked passages per question; answer correctness is not automatically scored.</div><div class="card"><h3>Dense retrieval vs. neural reranking</h3><div class="legend"><span>Dense retrieval</span><span>With reranking</span></div><div class="eval-chart-grid">${evalMetrics.map(([key,label])=>metricChart(label,key,s)).join("")}${latencyChart(s)}</div></div><div class="card eval-results-table"><h3>Per-question results and generated answers</h3><table><thead><tr><th>Question</th><th>Dense MRR</th><th>Reranked MRR</th><th>Dense time</th><th>Reranked time</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+async function loadEval(){if(!docs.length)await loadDocs()}
+$("#runEval").onclick=async()=>{const docId=$("#evaldoc").value,file=$("#evalfile").files[0];if(!docId){toast("Choose an indexed PDF first","err");return}if(!file){toast("Choose a labeled questions CSV first","err");return}const button=$("#runEval");button.disabled=true;$("#evalbox").innerHTML=`<div class="empty"><span class="spin"></span> Evaluating retrieval and generating one answer per question… this uses one model API call per question.</div>`;try{const questions=await readEvalCsv(file),data=await api(`/v1/evaluation/documents/${encodeURIComponent(docId)}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({questions,top_k:5})});renderEval(data);toast("PDF evaluation complete","ok",3000)}catch(e){$("#evalbox").innerHTML=`<div class="errbox">${esc(e.message)}</div>`;toast(e.message,"err",8000)}finally{button.disabled=false}};
+loadHealth();loadDocs();
+</script>
+</body>
+</html>
