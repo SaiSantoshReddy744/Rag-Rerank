@@ -1,0 +1,24 @@
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    UV_LINK_MODE=copy \
+    DATA_DIR=/var/data/appdata \
+    HF_HOME=/var/data/huggingface \
+    EMBEDDING_DEVICE=cpu \
+    RE_RANK_ENABLED=true
+
+WORKDIR /app
+
+RUN pip install --no-cache-dir uv
+
+COPY pyproject.toml uv.lock README.md ./
+RUN uv sync --frozen --no-dev --no-install-project \
+    && uv pip install --python /app/.venv/bin/python "streamlit>=1.40,<2.0"
+
+COPY app ./app
+COPY streamlit_app.py ./streamlit_app.py
+
+EXPOSE 10000
+CMD ["sh", "-c", ".venv/bin/streamlit run streamlit_app.py --server.address 0.0.0.0 --server.port ${PORT:-10000} --server.headless true"]

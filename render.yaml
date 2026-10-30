@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: rag-rerank
+    runtime: docker
+    plan: pro
+    dockerfilePath: ./Dockerfile.streamlit
+    dockerContext: .
+    healthCheckPath: /_stcore/health
+    disk:
+      name: rag-rerank-data
+      mountPath: /var/data
+      sizeGB: 5
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        sync: false
+      - key: APP_ENV
+        value: production
+      - key: DATA_DIR
+        value: /var/data/appdata
+      - key: HF_HOME
+        value: /var/data/huggingface
+      - key: EMBEDDING_DEVICE
+        value: cpu
+      - key: RE_RANK_ENABLED
+        value: "true"
+      - key: RERANK_CANDIDATE_K
+        value: "20"
